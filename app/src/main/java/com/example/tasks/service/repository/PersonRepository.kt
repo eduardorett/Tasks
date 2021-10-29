@@ -1,6 +1,9 @@
 package com.example.tasks.service.repository
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import com.example.tasks.R
 import com.example.tasks.service.model.HeaderModel
 import com.example.tasks.service.constants.TaskConstants
@@ -12,12 +15,18 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class PersonRepository(val context: Context) {
+class PersonRepository(val context: Context):BaseRepository(context) {
 
     private val mRemote = RetrofitClient.createService(PersonService::class.java)
 
     // TEM QUE POR NO MANIFEST PRA FORÇAR O HTTPS "USES CLEAR TRAFIC TRUE"
     fun login(email:String, password:String, listener: APIlistener<HeaderModel>){
+
+        if(!isConnectionAvailable(context)){
+            listener.onFailure(context.getString(R.string.ERROR_INTERNET_CONNECTION))
+            return
+        }
+
            val call: Call<HeaderModel> = mRemote.login(email,password)
 
         call.enqueue(object: Callback<HeaderModel>{ // ISSO VE APENAS SE CONCECTOU, OS DADOS PODEM VIR ERRADOS ainda
@@ -42,6 +51,11 @@ class PersonRepository(val context: Context) {
 
     fun create(name:String,email:String,password:String, listener: APIlistener<HeaderModel>){
 
+        if(!isConnectionAvailable(context)){
+            listener.onFailure(context.getString(R.string.ERROR_INTERNET_CONNECTION))
+            return
+        }
+
         val call: Call<HeaderModel> = mRemote.create(name,email,password)
 
         call.enqueue(object: Callback<HeaderModel>{ // ISSO VE APENAS SE CONCECTOU, OS DADOS PODEM VIR ERRADOS ainda
@@ -63,4 +77,6 @@ class PersonRepository(val context: Context) {
 
         })
     }
+
+
 }

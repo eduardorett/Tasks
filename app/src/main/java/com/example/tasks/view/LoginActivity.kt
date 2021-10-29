@@ -31,7 +31,24 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View) {
         if (v.id == R.id.button_login) {
-            handleLogin()
+            val email = edit_email.text.toString()
+            val password = edit_password.text.toString()
+
+
+
+          if(  email == "" && password == ""){
+                  Toast.makeText(this,"Preencha o cabeçalho",Toast.LENGTH_SHORT).show()
+            }else if(email =="" && password != ""){
+              Toast.makeText(this,"Preencha o email",Toast.LENGTH_SHORT).show()
+          } else if(email !="" && password == ""){
+              Toast.makeText(this,"Preencha a senha",Toast.LENGTH_SHORT).show()
+          }
+          else{
+                handleLogin()
+            }
+
+
+
         } else if (v.id == R.id.text_register) {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
@@ -59,6 +76,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
         mViewModel.login.observe(this, Observer {
             if(it.succes()){
                 startActivity(Intent(this,MainActivity::class.java))
+                finish()
             } else {
                 val message = it.failure()
                 Toast.makeText(this,message, Toast.LENGTH_SHORT).show()
@@ -68,6 +86,7 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
 
             if(it){
             startActivity(Intent(this,MainActivity::class.java))
+                finish()
             }
 
         })
@@ -79,6 +98,18 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
     private fun handleLogin() {
         val email = edit_email.text.toString()
         val password = edit_password.text.toString()
+
+        var count:Int = 0
+
+          if(email == ""){
+             count+1
+          }else if(password == ""){
+              count+1
+          }
+
+        if(count == 2){
+            Toast.makeText(this,"Preencha o cabeçalho",Toast.LENGTH_SHORT).show()
+        }
 
         mViewModel.doLogin(email, password)
     }

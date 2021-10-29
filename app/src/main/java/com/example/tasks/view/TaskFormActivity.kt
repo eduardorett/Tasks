@@ -3,6 +3,7 @@ package com.example.tasks.view
 import android.app.DatePickerDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.DatePicker
@@ -22,7 +23,7 @@ class TaskFormActivity : AppCompatActivity(), View.OnClickListener,DatePickerDia
     private lateinit var mViewModel: TaskFormViewModel
 private val mDateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
 private val mListPriorityId:MutableList<Int> = arrayListOf()
-  private val mTaskId = 0
+  private var mTaskId = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,16 +35,18 @@ private val mListPriorityId:MutableList<Int> = arrayListOf()
         listeners()
         observe()
 
-        mViewModel.listPriorities()
+
 
         loadDataFromActitivty()
+        mViewModel.listPriorities()
     }
 
     private fun loadDataFromActitivty(){
         val bundle = intent.extras
     if (bundle != null){
         mTaskId = bundle.getInt(TaskConstants.BUNDLE.TASKID)
-        mViewModel.load(taskId)
+        mViewModel.load(mTaskId)
+        button_save.text = getString(R.string.update_task)
         }
 
     }
@@ -57,6 +60,7 @@ private val mListPriorityId:MutableList<Int> = arrayListOf()
     }
 
     private fun handleSave(){
+
         val task = TaskModel().apply{
            this.Id = mTaskId
             this.Descripiton = edit_description.text.toString()
@@ -66,8 +70,6 @@ private val mListPriorityId:MutableList<Int> = arrayListOf()
         }
         mViewModel.save(task)
     }
-
-
 
     private fun showDatePicker(){
 
@@ -85,26 +87,57 @@ private val mListPriorityId:MutableList<Int> = arrayListOf()
 
         mViewModel.priorities.observe(this, androidx.lifecycle.Observer {
 
+            Log.d("PRIORITYLIST", "CHAMOU AQUI")
             val list:MutableList<String> = arrayListOf()
             for (item in it){
                 list.add(item.Descripition)
                 mListPriorityId.add(item.id)
+                Log.d("PRIORITYLIST", "adicionando item")
 
             }
 
             val adapter = ArrayAdapter(this,android.R.layout.simple_spinner_dropdown_item,list)
 
+
             spinner_priority.adapter = adapter
         })
         mViewModel.validation.observe(this,androidx.lifecycle.Observer {
-            if (it.succes()){
-                Toast.makeText(this,"Sucesso",Toast.LENGTH_SHORT).show()
-            }else{
-                Toast.makeText(this, it.failure(),Toast.LENGTH_SHORT).show()
-
+            if (it.succes()) {
+                if (mTaskId == 0) {
+                    toast(getString(R.string.task_created))
+                } else {
+                   toast(getString(R.string.task_updated))
+                }
             }
+            else{
+                    Toast.makeText(this, it.failure(), Toast.LENGTH_SHORT).show()
+                }
+            })
+
+        mViewModel.Task.observe(this,androidx.lifecycle.Observer {
+            edit_description.setText(it.Descripiton)
+        check_complete.isChecked = it.Complete
+            spinner_priority.setSelection(getIndex(it.PriorityId))
+
+            val date = SimpleDateFormat("yyyy-MM-dd").parse(it.DueDate)
+            button_date.text = mDateFormat.format(date)
         })
 
+    }
+
+    private fun toast(str:String){
+        Toast.makeText(this,str,Toast.LENGTH_SHORT).show()
+    }
+
+    private fun getIndex(priorityId:Int):Int{
+     var index = 0
+        for(i in 0 until mListPriorityId.count()){
+       if(mListPriorityId[i] == priorityId){
+           index = i
+           break
+       }
+     }
+        return index
     }
 
     private fun listeners() {

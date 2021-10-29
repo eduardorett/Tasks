@@ -1,6 +1,9 @@
 package com.example.tasks.service.repository
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import com.example.tasks.R
 import com.example.tasks.service.constants.TaskConstants
 import com.example.tasks.service.listener.APIlistener
@@ -15,13 +18,17 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class PriorityRepository(context:Context) {
+class PriorityRepository( val context:Context) : BaseRepository(context){
 
     private val mRemote = RetrofitClient.createService(PriorityService::class.java) // ??????? COMEÇA AQUI O PROBLEMA 1
     private val mPriorityDataBase = TaskDatabase.getDatabase(context).priorityDAO()
 
 
     fun all(){
+
+        if(!isConnectionAvailable(context)){
+            return
+        }
         val call: Call<List<PriorityModel>> = mRemote.list() // PORQUE TA DANDO MISMATCH??????????????? TERMINA AQUI 2
 
         call.enqueue(object: Callback<List<PriorityModel>> {
@@ -49,5 +56,7 @@ class PriorityRepository(context:Context) {
     fun list() = mPriorityDataBase.list()
 
     fun getDescription(id:Int) = mPriorityDataBase.getDescription(id)
+
+
 
 }

@@ -36,6 +36,8 @@
     <Spinner
         android:id="@+id/spinner_priority"
         android:layout_width="0dp"
+        android:textAlignment="textStart"
+        android:visibility="visible"
         android:layout_height="wrap_content"
         android:backgroundTint="#c1c1c1"
         app:layout_constraintLeft_toLeftOf="parent"

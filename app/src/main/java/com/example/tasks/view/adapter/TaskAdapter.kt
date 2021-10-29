@@ -21,18 +21,18 @@ class TaskAdapter : RecyclerView.Adapter<TaskViewHolder>() {
 
     override fun getItemCount(): Int {
         return 0
-        // return mList.count()
+         return mList.count()
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
-        holder.bindData()
+        holder.bindData(mList[position])
     }
 
     fun attachListener(listener: TaskListener) {
         mListener = listener
     }
 
-    fun updateListener(list: List<TaskModel>){
+    fun updateList(list: List<TaskModel>){
 
     mList = list
     notifyDataSetChanged()
