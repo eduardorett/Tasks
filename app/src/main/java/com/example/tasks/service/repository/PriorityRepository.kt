@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.util.Log
 import com.example.tasks.R
 import com.example.tasks.service.constants.TaskConstants
 import com.example.tasks.service.listener.APIlistener
@@ -18,45 +19,57 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class PriorityRepository( val context:Context) : BaseRepository(context){
+class PriorityRepository(val context: Context) : BaseRepository(context) {
 
-    private val mRemote = RetrofitClient.createService(PriorityService::class.java) // ??????? COMEÇA AQUI O PROBLEMA 1
+    private val mRemote =
+        RetrofitClient.createService(PriorityService::class.java) // ??????? COMEÇA AQUI O PROBLEMA 1
     private val mPriorityDataBase = TaskDatabase.getDatabase(context).priorityDAO()
 
 
-    fun all(){
-
-        if(!isConnectionAvailable(context)){
+    fun all() {
+        Log.d("PRIORITYLIST", "Chegou repositorio all()")
+        if (!isConnectionAvailable(context)) {
             return
         }
-        val call: Call<List<PriorityModel>> = mRemote.list() // PORQUE TA DANDO MISMATCH??????????????? TERMINA AQUI 2
+        Log.d("PRIORITYLIST", "Chamando API do remote")
 
-        call.enqueue(object: Callback<List<PriorityModel>> {
+        val call: Call<List<PriorityModel>> =
+            mRemote.list() // PORQUE TA DANDO MISMATCH??????????????? TERMINA AQUI 2
+
+        call.enqueue(object : Callback<List<PriorityModel>> {
             override fun onResponse(
                 call: Call<List<PriorityModel>>,
                 response: Response<List<PriorityModel>>
             ) {
 
-                if (response.code() != TaskConstants.HTTP.SUCCESS){
-                   mPriorityDataBase.clear() // tem que limpar o usuario prévio se não crasha, mesmo que for relogar
-                    response.body()?.let { mPriorityDataBase.save(it) } // mDatabase.save(response.body())
+                if (response.code() == TaskConstants.HTTP.SUCCESS) {
+                    Log.d("PRIORITYLIST", "Response Sucesso!")
+                    response.body()?.forEach {
+                        Log.d("PRIORITYLIST", "priority -->"+it.toString())
+                    }
+                    mPriorityDataBase.clear()
 
-            }
+                    response.body()
+                        ?.let { mPriorityDataBase.save(it) } // mDatabase.save(response.body())
+
+                } else {
+                    Log.d("PRIORITYLIST", "Response fracasso! code-->" + response.code())
+                }
             }
 
             override fun onFailure(call: Call<List<PriorityModel>>, t: Throwable) {
                 TODO("Not yet implemented")
+                Log.d("PRIORITYLIST", "Response erro!")
             }
 
         }
 
-            )
+        )
     }
 
     fun list() = mPriorityDataBase.list()
 
-    fun getDescription(id:Int) = mPriorityDataBase.getDescription(id)
-
+    fun getDescription(id: Int) = mPriorityDataBase.getDescription(id)
 
 
 }

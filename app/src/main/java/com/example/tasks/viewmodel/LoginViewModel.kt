@@ -65,7 +65,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         val logged = (token != "" && person !="")
 
         if(!logged){
-mPriorityRepository.all() // PORQUE???????
+            mPriorityRepository.all() // PORQUE???????
         }
 
         mLoggedUser.value = logged

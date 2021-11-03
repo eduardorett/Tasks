@@ -10,29 +10,30 @@ import retrofit2.converter.gson.GsonConverterFactory
 class RetrofitClient private constructor() {
 
 
-//conexão com banco remoto
+    //conexão com banco remoto
     companion object {
 
         private lateinit var retrofit: Retrofit
-        private val baseurl = " http://devmasterteam.com/CursoAndroidAPI/" // tem sempre que por / no final dos http
-private var personKey = ""
-    private var tokenKey = ""
+        private val baseurl =
+            "http://devmasterteam.com/CursoAndroidAPI/" // tem sempre que por / no final dos http
+        private var personKey = ""
+        private var tokenKey = ""
 
-        private fun getRetrofitInstance ():Retrofit{
+        private fun getRetrofitInstance(): Retrofit {
             val httpClient = OkHttpClient.Builder()
-            httpClient.addInterceptor(object: Interceptor {
-                override  fun intercept(chain:Interceptor.Chain): Response {
+            httpClient.addInterceptor(object : Interceptor {
+                override fun intercept(chain: Interceptor.Chain): Response {
                     val request =
                         chain.request()
                             .newBuilder()
-                            .addHeader(TaskConstants.HEADER.PERSON_KEY,personKey)
-                            .addHeader(TaskConstants.HEADER.TOKEN_KEY,tokenKey)
+                            .addHeader(TaskConstants.HEADER.PERSON_KEY, personKey)
+                            .addHeader(TaskConstants.HEADER.TOKEN_KEY, tokenKey)
                             .build()
                     return chain.proceed(request)
                 }
             })
 
-            if (!Companion::retrofit.isInitialized){
+            if (!Companion::retrofit.isInitialized) {
                 retrofit = Retrofit.Builder()
                     .baseUrl(baseurl)
                     .client(httpClient.build())
@@ -42,12 +43,13 @@ private var personKey = ""
             return retrofit
         }
 
-    fun addHeader (token:String,personKey:String){
-       this.personKey = personKey
-           this.tokenKey = token
-    }
+        fun addHeader(token: String, personKey: String) {
+            this.personKey = personKey
+            this.tokenKey = token
+        }
+
         // esse <S>  é para falar que é generico para pegar qualquer url sem ter que definir nada especifico
-        fun <S> createService(serviceClass: Class<S>):S{
+        fun <S> createService(serviceClass: Class<S>): S {
             return getRetrofitInstance().create(serviceClass)
         }
     }
