@@ -1,6 +1,7 @@
 package com.example.tasks.view
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -105,8 +106,11 @@ private val mListPriorityId:MutableList<Int> = arrayListOf()
             if (it.succes()) {
                 if (mTaskId == 0) {
                     toast(getString(R.string.task_created))
+                    startActivity(Intent(this,MainActivity::class.java))
                 } else {
                    toast(getString(R.string.task_updated))
+                    startActivity(Intent(this,MainActivity::class.java))
+
                 }
             }
             else{

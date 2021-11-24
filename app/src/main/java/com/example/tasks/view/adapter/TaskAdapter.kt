@@ -20,7 +20,7 @@ class TaskAdapter : RecyclerView.Adapter<TaskViewHolder>() {
     }
 
     override fun getItemCount(): Int {
-        return 0
+
          return mList.count()
     }
 
